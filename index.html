@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Target SPA Demo</title>
   <meta charset="UTF-8" />
 
-  <!-- Adobe Launch DEV (loads at.js 2.x) -->
+  <!-- Adobe Launch embed -->
   <script
     src="https://assets.adobedtm.com/9076f6ae4b28/0a9fbbf65540/launch-15a3d1898942-development.min.js"
     async>
@@ -25,95 +26,86 @@
   <div id="view"></div>
 
   <script>
-    /*******************************
-     * Utility: Track SPA View
-     *******************************/
-    function trackView(viewName) {
-      if (window.adobe && adobe.target) {
-        adobe.target.triggerView(viewName);
-        console.log("Target view triggered:", viewName);
-      }
-    }
-
-    /*******************************
-     * Utility: Request Recommendations
-     *******************************/
-    function requestTarget(pageType, productId) {
-      if (!window.adobe || !adobe.target) {
-        console.warn("Adobe Target not loaded yet");
-        return;
-      }
-
-      adobe.target.getOffers({
-        request: {
-          execute: {
-            mboxes: [
-              {
-                index: 0,
-                name: "spa-recs",
-                parameters: {
-                  pageType: pageType,   // home | product
-                  productId: productId  // "", P1, P2
-                }
-              }
-            ]
-          }
-        }
-      }).then(function (response) {
-        console.log("Target offers received:", response);
-
-        adobe.target.applyOffers({
-          response: response,
-          selector: "#recs"
-        });
-      }).catch(function (error) {
-        console.error("Target error:", error);
-      });
-    }
-
-    /*******************************
-     * SPA Navigation
-     *******************************/
+    // ===============================
+    // SPA Navigation
+    // ===============================
     function goTo(viewName) {
-      const viewDiv = document.getElementById("view");
 
-      if (viewName === "home") {
-        viewDiv.innerHTML = `
+      if (viewName === 'home') {
+        document.getElementById('view').innerHTML = `
           <h2>Home</h2>
           <div id="recs"></div>
         `;
 
-        trackView("home");
-        requestTarget("home", "");
+        // Home view – no entityId
+        requestTarget("home");
       }
 
-      if (viewName === "product1") {
-        viewDiv.innerHTML = `
+      if (viewName === 'product1') {
+        document.getElementById('view').innerHTML = `
           <h2>Product 1</h2>
           <p>Product ID: P1</p>
           <div id="recs"></div>
         `;
 
-        trackView("product-P1");
+        // Product 1 – send entityId
         requestTarget("product", "P1");
       }
 
-      if (viewName === "product2") {
-        viewDiv.innerHTML = `
+      if (viewName === 'product2') {
+        document.getElementById('view').innerHTML = `
           <h2>Product 2</h2>
           <p>Product ID: P2</p>
           <div id="recs"></div>
         `;
 
-        trackView("product-P2");
+        // Product 2 – send entityId
         requestTarget("product", "P2");
       }
     }
 
-    /*******************************
-     * Initial Load
-     *******************************/
-    goTo("home");
+    // ===============================
+    // Adobe Target Recommendation Call
+    // ===============================
+    function requestTarget(pageType, entityId) {
+
+      if (!window.adobe || !adobe.target) {
+        console.warn("Adobe Target not loaded yet");
+        return;
+      }
+
+      const mbox = {
+        name: "spa-recs",     // Must match Form-based activity location
+        index: 0,
+        parameters: {
+          pageType: pageType
+        }
+      };
+
+      // Only send entityId for product views
+      if (entityId) {
+        mbox.parameters.entityId = entityId;
+      }
+
+      adobe.target.getOffers({
+        request: {
+          execute: {
+            mboxes: [mbox]
+          }
+        }
+      }).then(function (response) {
+        console.log("Target response:", response);
+        adobe.target.applyOffers({ response });
+      }).catch(function (error) {
+        console.error("Target error:", error);
+      });
+    }
+
+    // ===============================
+    // Default Load
+    // ===============================
+    goTo('home');
   </script>
 </body>
+
 </html>
