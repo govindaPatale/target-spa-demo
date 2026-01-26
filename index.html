@@ -2,108 +2,108 @@
 <html>
 
 <head>
-  <title>Target SPA Demo</title>
-  <meta charset="UTF-8" />
+    <title>Target SPA Demo</title>
+    <meta charset="UTF-8" />
 
-  <!-- Adobe Launch embed (loads at.js via Launch) -->
-  <script src="https://assets.adobedtm.com/9076f6ae4b28/0a9fbbf65540/launch-15a3d1898942-development.min.js"
-    async></script>
+    <!-- Adobe Launch embed (loads at.js via Launch) -->
+    <script src="https://assets.adobedtm.com/9076f6ae4b28/0a9fbbf65540/launch-15a3d1898942-development.min.js"
+        async></script>
 </head>
 
 <body>
-  <h1>Adobe Target SPA Recommendations Demo</h1>
+    <h1>Adobe Target SPA Recommendations Demo</h1>
 
-  <nav>
-    <button onclick="goTo('home')">Home</button>
-    <button onclick="goTo('product1')">Product 1</button>
-    <button onclick="goTo('product2')">Product 2</button>
-  </nav>
+    <nav>
+        <button onclick="goTo('home')">Home</button>
+        <button onclick="goTo('product1')">Product 1</button>
+        <button onclick="goTo('product2')">Product 2</button>
+    </nav>
 
-  <hr />
+    <hr />
 
-  <div id="view"></div>
+    <div id="view"></div>
 
-  <script>
-    /*******************************
-     * 1️⃣ SPA navigation
-     *******************************/
-    function goTo(viewName) {
+    <script>
+        /*******************************
+         * 1️⃣ SPA navigation
+         *******************************/
+        function goTo(viewName) {
+            const viewDiv = document.getElementById('view');
 
-      if (viewName === 'home') {
-        document.getElementById('view').innerHTML = `
-          <h2>Home</h2>
-          <div id="recs"></div>
-        `;
+            if (viewName === 'home') {
+                viewDiv.innerHTML = `
+        <h2>Home</h2>
+        <div id="recs"></div>
+      `;
+                // Home → send pageType = "home", productId = ""
+                requestTarget("home", "");
+            }
 
-        // Home → 5 generic recommendations
-        requestTarget("home", "");
-      }
+            if (viewName === 'product1') {
+                viewDiv.innerHTML = `
+        <h2>Product 1</h2>
+        <p>Product ID: P1</p>
+        <div id="recs"></div>
+      `;
+                // Product 1 → pageType = "product", productId = "P1"
+                requestTarget("product", "P1");
+            }
 
-      if (viewName === 'product1') {
-        document.getElementById('view').innerHTML = `
-          <h2>Product 1</h2>
-          <p>Product ID: P1</p>
-          <div id="recs"></div>
-        `;
-
-        // Product 1 → recommendations based on P1
-        requestTarget("product", "P1");
-      }
-
-      if (viewName === 'product2') {
-        document.getElementById('view').innerHTML = `
-          <h2>Product 2</h2>
-          <p>Product ID: P2</p>
-          <div id="recs"></div>
-        `;
-
-        // Product 2 → recommendations based on P2
-        requestTarget("product", "P2");
-      }
-    }
-
-    /*******************************
-     * 2️⃣ Target request function
-     * (NO trigger, at.js 2.0 style)
-     *******************************/
-    function requestTarget(pageType, productId) {
-
-      if (!window.adobe || !adobe.target) {
-        console.warn("Adobe Target not loaded yet");
-        return;
-      }
-
-      adobe.target.getOffers({
-        request: {
-          execute: {
-            mboxes: [
-              {
-                index: 0,
-                name: "spa-recs",
-                parameters: {
-                  pageType: pageType,
-                  productId: productId
-                }
-              }
-            ]
-          }
+            if (viewName === 'product2') {
+                viewDiv.innerHTML = `
+        <h2>Product 2</h2>
+        <p>Product ID: P2</p>
+        <div id="recs"></div>
+      `;
+                // Product 2 → pageType = "product", productId = "P2"
+                requestTarget("product", "P2");
+            }
         }
-      }).then(function (response) {
-        console.log("Target response:", response);
 
-        adobe.target.applyOffers({
-          response: response
-        });
-      }).catch(function (error) {
-        console.error("Target error:", error);
-      });
-    }
+        /*******************************
+         * 2️⃣ Target request function
+         * (at.js 2.0, single activity)
+         *******************************/
+        function requestTarget(pageType, productId) {
+            if (!window.adobe || !adobe.target) {
+                console.warn("Adobe Target not loaded yet");
+                return;
+            }
 
-    /*******************************
-     * 3️⃣ Default load
-     *******************************/
-    goTo('home');
-  </script>
+            adobe.target.getOffers({
+                request: {
+                    execute: {
+                        mboxes: [
+                            {
+                                index: 0,               // REQUIRED in at.js 2.0
+                                name: "spa-recs",       // Must match your activity
+                                parameters: {
+                                    pageType: pageType,   // "home" or "product"
+                                    productId: productId  // "" or "P1"/"P2"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }).then(function (response) {
+                console.log("Target response:", response);
+
+                // Apply offers to #recs container
+                adobe.target.applyOffers({
+                    response: response,
+                    selector: "#recs"
+                });
+            }).catch(function (error) {
+                console.error("Target error:", error);
+            });
+        }
+
+        /*******************************
+         * 3️⃣ Default load
+         *******************************/
+        goTo('home');
+    </script>
+
 </body>
 
 </html>
