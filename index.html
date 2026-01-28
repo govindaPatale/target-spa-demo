@@ -1,84 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Adobe Target SPA Recs Demo</title>
-
-  <!-- ADOBE TARGET at.js 2.x -->
-  <script src="https://assets.adobetarget.com/YOUR_CLIENT_CODE/at.js"></script>
-
-  <script>
-    window.targetGlobalSettings = {
-      clientCode: "YOUR_CLIENT_CODE",
-      serverDomain: "YOUR_CLIENT_CODE.tt.omtrdc.net",
-      imsOrgId: "YOUR_IMS_ORG_ID",
-      cookieDomain: "govindapatale.github.io",
-      viewsEnabled: true
-    };
-  </script>
-
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    button { margin-right: 10px; padding: 8px 12px; }
-    #recs { margin-top: 20px; border: 1px solid #ccc; padding: 16px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Target Recs Demo</title>
+    <script src="js/at.js"></script>
 </head>
-
 <body>
+    <h1>Welcome to the Demo Store</h1>
+    
+    <div id="recs-container">
+        <p>Loading recommendations...</p>
+    </div>
 
-  <h1>Target SPA Recommendations Demo</h1>
-
-  <button onclick="goToHome()">Home</button>
-  <button onclick="goToProduct('kit2004')">Kit 2004</button>
-  <button onclick="goToProduct('kit2005')">Kit 2005</button>
-
-  <!-- 🔴 REQUIRED ROOT CONTAINER -->
-  <div id="view"></div>
-
-  <script>
-    /************************************
-     * INITIAL PAGE LOAD
-     ************************************/
-    document.addEventListener("DOMContentLoaded", function () {
-      goToHome();
-    });
-
-    /************************************
-     * HOME (DEFAULT RECS)
-     ************************************/
-    function goToHome() {
-      const view = document.getElementById("view");
-
-      view.innerHTML = `
-        <h2>Home</h2>
-        <div id="recs">Loading recommendations...</div>
-      `;
-
-      adobe.target.getOffers({
-        mbox: "spa-recs",
-        params: {
-          pageType: "home"
-        },
-        success: renderOffers,
-        error: console.error
-      });
-    }
-
-    /************************************
-     * PRODUCT CLICK (CHANGE CONTEXT)
-     ************************************/
-    function goToProduct(productId) {
-      const view = document.getElementById("view");
-
-      view.innerHTML = `
-        <h2>Product: ${productId}</h2>
-        <div id="recs">Loading recommendations...</div>
-      `;
-
-      adobe.target.getOffers({
-        mbox: "spa-recs",
-        params: {
-          entity.id: productId
-        },
-        success: renderOffers,
-        error: c
+    <script>
+        function targetPageParams() {
+            return {
+                "entity": {
+                    "id": "kit2004",
+                }
+            };
+        }
+    </script>
+</body>
+</html>
