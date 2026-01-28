@@ -15,26 +15,29 @@
     </div>
 
     <script>
-    // Listen for the specific event that Target is ready
-    document.addEventListener("at-library-loaded", function() {
-        
-        adobe.target.getOffer({
-            "mbox": "spa-recs",
-            "params": {
-                "entity.id": "kit2004",
-            },
-            "success": function(offer) {
-                adobe.target.applyOffer({
-                    "mbox": "spa-recs",
-                    "selector": "#recs-container",
-                    "offer": offer
-                });
-            },
-            "error": function(status, error) {
-                console.error('Target Error:', status, error);
-            }
-        });
-    });
+document.addEventListener("at-library-loaded", function () {
+
+  adobe.target.getOffer({
+    mbox: "spa-recs",
+    params: {
+      "entity.id": "kit2004",
+      "entity.categories": "housewares:appliances",      // MUST exist in catalog
+      "recommendation.key": "kit2004"   // REQUIRED
+    },
+    success: function (offer) {
+      adobe.target.applyOffer({
+        mbox: "spa-recs",
+        selector: "#recs-container",
+        offer: offer
+      });
+    },
+    error: function (status, error) {
+      console.error("Target Error:", status, error);
+    }
+  });
+
+});
 </script>
+
 </body>
 </html>
