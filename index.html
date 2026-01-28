@@ -15,31 +15,27 @@
     </div>
 
     <script>
-        // Use a listener to make sure the page is ready
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            // Trigger the custom 'spa-recs' location
-            adobe.target.getOffer({
-                "mbox": "spa-recs",
-                "params": {
-                    "entity.id": "product-123", // Replace with a real ID from your catalog
-                    "entity.categoryId": "featured"
-                },
-                "success": function(offer) {
-                    // This injects the Recommendation into your div
-                    adobe.target.applyOffer({
-                        "mbox": "spa-recs",
-                        "selector": "#recs-container",
-                        "offer": offer
-                    });
-                },
-                "error": function(status, error) {
-                    console.error('Target Error:', status, error);
-                }
-            });
-            
+    // Listen for the specific event that Target is ready
+    document.addEventListener("at-library-loaded", function() {
+        
+        adobe.target.getOffer({
+            "mbox": "spa-recs",
+            "params": {
+                "entity.id": "product-123",
+                "entity.categoryId": "featured"
+            },
+            "success": function(offer) {
+                adobe.target.applyOffer({
+                    "mbox": "spa-recs",
+                    "selector": "#recs-container",
+                    "offer": offer
+                });
+            },
+            "error": function(status, error) {
+                console.error('Target Error:', status, error);
+            }
         });
-    </script>
-
+    });
+</script>
 </body>
 </html>
