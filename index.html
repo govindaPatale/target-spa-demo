@@ -107,7 +107,15 @@
                     const html = mbox.options[0].content;
 
                     // Inject into page
-                    document.getElementById("recs").innerHTML = html;
+                    const recsEl = document.getElementById("recs");
+
+                    if (!recsEl) {
+                        console.warn("Recs container not found. View may have changed.");
+                        return;
+                    }
+
+                    recsEl.innerHTML = html;
+
                 })
 
             }).catch(function (error) {
