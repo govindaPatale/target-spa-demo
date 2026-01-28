@@ -7,20 +7,39 @@
     </script>
 </head>
 <body>
-    <h1>Welcome to the Demo Store</h1>
-    
+
+    <h1>My Demo Store</h1>
+
     <div id="recs-container">
-        <p>Loading recommendations...</p>
+        <p>Fetching your personalized recommendations...</p>
     </div>
 
     <script>
-        function targetPageParams() {
-            return {
-                "entity": {
-                    "id": "kit2004",
+        // Use a listener to make sure the page is ready
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // Trigger the custom 'spa-recs' location
+            adobe.target.getOffer({
+                "mbox": "spa-recs",
+                "params": {
+                    "entity.id": "product-123", // Replace with a real ID from your catalog
+                    "entity.categoryId": "featured"
+                },
+                "success": function(offer) {
+                    // This injects the Recommendation into your div
+                    adobe.target.applyOffer({
+                        "mbox": "spa-recs",
+                        "selector": "#recs-container",
+                        "offer": offer
+                    });
+                },
+                "error": function(status, error) {
+                    console.error('Target Error:', status, error);
                 }
-            };
-        }
+            });
+            
+        });
     </script>
+
 </body>
 </html>
