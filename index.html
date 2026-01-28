@@ -2,110 +2,124 @@
 <html>
 
 <head>
-  <title>Target SPA Demo</title>
-  <meta charset="UTF-8" />
+    <title>Target SPA Demo</title>
+    <meta charset="UTF-8" />
 
-  <!-- Adobe Launch embed -->
-  <script
-    src="https://assets.adobedtm.com/9076f6ae4b28/0a9fbbf65540/launch-15a3d1898942-development.min.js"
-    async>
-  </script>
+    <!-- Adobe Launch embed -->
+    <script src="https://assets.adobedtm.com/9076f6ae4b28/0a9fbbf65540/launch-15a3d1898942-development.min.js" async>
+    </script>
 </head>
 
 <body>
-  <h1>Adobe Target SPA Recommendations Demo</h1>
+    <h1>Adobe Target SPA Recommendations Demo</h1>
 
-  <nav>
-    <button onclick="goTo('home')">Home</button>
-    <button onclick="goTo('product1')">Product 1</button>
-    <button onclick="goTo('product2')">Product 2</button>
-  </nav>
+    <nav>
+        <button onclick="goTo('home')">Home</button>
+        <button onclick="goTo('product1')">Product 1</button>
+        <button onclick="goTo('product2')">Product 2</button>
+    </nav>
 
-  <hr />
+    <hr />
 
-  <div id="recs" data-mbox="spa-recs"></div>
+    <div id="recs"></div>
 
-  <script>
-    // ===============================
-    // SPA Navigation
-    // ===============================
-    function goTo(viewName) {
+    <script>
+        // ===============================
+        // SPA Navigation
+        // ===============================
+        function goTo(viewName) {
 
-      if (viewName === 'home') {
-        document.getElementById('view').innerHTML = `
+            if (viewName === 'home') {
+                document.getElementById('view').innerHTML = `
           <h2>Home</h2>
           <div id="recs"></div>
         `;
 
-        // Home view – no entityId
-        requestTarget("home");
-      }
+                // Home view – no entityId
+                requestTarget("home");
+            }
 
-      if (viewName === 'product1') {
-        document.getElementById('view').innerHTML = `
+            if (viewName === 'product1') {
+                document.getElementById('view').innerHTML = `
           <h2>Product 1</h2>
           <p>Product ID: kit2004</p>
           <div id="recs"></div>
         `;
 
-        // Product 1 – send entityId
-        requestTarget("product", "kit2004")
-      }
+                // Product 1 – send entityId
+                requestTarget("product", "kit2004")
+            }
 
-      if (viewName === 'product2') {
-        document.getElementById('view').innerHTML = `
+            if (viewName === 'product2') {
+                document.getElementById('view').innerHTML = `
           <h2>Product 2</h2>
           <p>Product ID: kit2005</p>
           <div id="recs"></div>
         `;
 
-        // Product 2 – send entityId
-        requestTarget("product", "kit2005")
-      }
-    }
-
-    // ===============================
-    // Adobe Target Recommendation Call
-    // ===============================
-    function requestTarget(pageType, entityId) {
-
-      if (!window.adobe || !adobe.target) {
-        console.warn("Adobe Target not loaded yet");
-        return;
-      }
-
-      const mbox = {
-        name: "spa-recs",     // Must match Form-based activity location
-        index: 0,
-        parameters: {
-          pageType: pageType
+                // Product 2 – send entityId
+                requestTarget("product", "kit2005")
+            }
         }
-      };
 
-      // Only send entityId for product views
-      if (entityId) {
-        mbox.parameters.entityId = entityId;
-      }
+        // ===============================
+        // Adobe Target Recommendation Call
+        // ===============================
+        function requestTarget(pageType, entityId) {
 
-      adobe.target.getOffers({
-        request: {
-          execute: {
-            mboxes: [mbox]
-          }
+            if (!window.adobe || !adobe.target) {
+                console.warn("Adobe Target not loaded yet");
+                return;
+            }
+
+            const mbox = {
+                name: "spa-recs",     // Must match Form-based activity location
+                index: 0,
+                parameters: {
+                    pageType: pageType
+                }
+            };
+
+            // Only send entityId for product views
+            if (entityId) {
+                mbox.parameters.entityId = entityId;
+            }
+
+            adobe.target.getOffers({
+                request: {
+                    execute: {
+                        mboxes: [mbox]
+                    }
+                }
+            }).then(function (response) {
+                console.log("Target response:", response);
+                adobe.target.then(function (response) {
+                    console.log("Target response:", response);
+
+                    const mbox = response.execute.mboxes[0];
+
+                    if (!mbox || !mbox.options || !mbox.options.length) {
+                        console.warn("No recommendations returned");
+                        return;
+                    }
+
+                    // Recommendations HTML from Target
+                    const html = mbox.options[0].content;
+
+                    // Inject into page
+                    document.getElementById("recs").innerHTML = html;
+                })
+
+            }).catch(function (error) {
+                console.error("Target error:", error);
+            });
         }
-      }).then(function (response) {
-        console.log("Target response:", response);
-        adobe.target.applyOffers({ response });
-      }).catch(function (error) {
-        console.error("Target error:", error);
-      });
-    }
 
-    // ===============================
-    // Default Load
-    // ===============================
-    goTo('home');
-  </script>
+        // ===============================
+        // Default Load
+        // ===============================
+        goTo('home');
+    </script>
 </body>
 
 </html>
